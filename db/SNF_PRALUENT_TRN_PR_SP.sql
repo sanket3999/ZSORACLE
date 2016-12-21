@@ -69,28 +69,28 @@ as
   -----------------------------------------------------------------------------------------------------------
   -- db record
   type updt_record is record (
-       client_id             thgsnf_toujeo_master_trn.client_id%type, 
-       table_id              thgsnf_toujeo_master_trn.table_id%type, 
-       record_type           thgsnf_toujeo_master_trn.record_type%type, 
-       hib_id                thgsnf_toujeo_master_trn.hib_id%type, 
-       hib_id_seq            thgsnf_toujeo_master_trn.hib_id_seq%type,
-       status                thgsnf_toujeo_master_trn.status%type
+       client_id             thgsnf_praluent_master_trn.client_id%type, 
+       table_id              thgsnf_praluent_master_trn.table_id%type, 
+       record_type           thgsnf_praluent_master_trn.record_type%type, 
+       hib_id                thgsnf_praluent_master_trn.hib_id%type, 
+       hib_id_seq            thgsnf_praluent_master_trn.hib_id_seq%type,
+       status                thgsnf_praluent_master_trn.status%type
        );
   ud_rec                     updt_record;
   -----------------------------------------------------------------------------------------------------------
   -- db record tables
   t1_table_id                thgmdb_db_table_xref.table_id%type                 :=  null;
-  t1_table_name              thgmdb_db_table_xref.table_name%type               :=  upper('thgsnf_toujeo_master_trn');
+  t1_table_name              thgmdb_db_table_xref.table_name%type               :=  upper('thgsnf_praluent_master_trn');
   t1_recs                    number  (10)                                       :=  0;
   t1                         number  (10)                                       :=  0;
-  type t1t_rec is table of   thgsnf_toujeo_master_trn%rowtype                   index by binary_integer;
+  type t1t_rec is table of   thgsnf_praluent_master_trn%rowtype                   index by binary_integer;
   t1_rec                     t1t_rec;
   --
   t2_table_id                thgmdb_db_table_xref.table_id%type                 :=  null;
-  t2_table_name              thgmdb_db_table_xref.table_name%type               :=  upper('thgsnf_toujeo_survey_trn');
+  t2_table_name              thgmdb_db_table_xref.table_name%type               :=  upper('thgsnf_praluent_survey_trn');
   t2_recs                    number  (10)                                       :=  0;
   t2                         number  (10)                                       :=  0;
-  type t2t_rec is table of   thgsnf_toujeo_survey_trn%rowtype                   index by binary_integer;
+  type t2t_rec is table of   thgsnf_praluent_survey_trn%rowtype                   index by binary_integer;
   t2_rec                     t2t_rec;
   --
   e1_hib_id                  thgmdb_error_dtl.hib_id%type                       :=  null;
@@ -108,8 +108,8 @@ as
   cursor c1_cur is 
   select s.hib_id as s_hib_id,
          m.*
-  from   thgsnf_toujeo_master_trn          m 
-  left outer join (select unique hib_id from thgsnf_toujeo_survey_trn) s
+  from   thgsnf_praluent_master_trn          m 
+  left outer join (select unique hib_id from thgsnf_praluent_survey_trn) s
   on   s.hib_id                         =  m.hib_id
   where  status = 'N';
   --
@@ -122,8 +122,8 @@ as
   cursor c2_cur is 
   select m.hib_id as m_hib_id,
          s.*
-  from   thgsnf_toujeo_survey_trn          s 
-  left outer join (select unique hib_id from thgsnf_toujeo_master_trn) m
+  from   thgsnf_praluent_survey_trn          s 
+  left outer join (select unique hib_id from thgsnf_praluent_master_trn) m
   on   m.hib_id                         =  s.hib_id
   where  status = 'N';
   --
@@ -135,12 +135,12 @@ as
   ------------------------------------------------------------------------------------------------------
   cursor c3_cur is 
   with trns as
-  (select client_id, table_id, record_type, hib_id, hib_id_seq, ip_record_type
-   from   thgsnf_toujeo_master_trn
+  (select client_id, table_id, record_type, hib_id, hib_id_seq --, ip_record_type
+   from   thgsnf_praluent_master_trn
    where status                         = 'PR'
    union 
-   select client_id, table_id, record_type, hib_id, hib_id_seq, ip_record_type
-   from   thgsnf_toujeo_survey_trn
+   select client_id, table_id, record_type, hib_id, hib_id_seq --, ip_record_type
+   from   thgsnf_praluent_survey_trn
    where status                         = 'PR')
   select trns.*
   from   trns,
@@ -367,7 +367,7 @@ end insert_e1_recs;
 procedure load_t1_rec
 -------------------------------------------------------------------------------------------------------------
 is
-begin -- thgsnf_toujeo_master_trn
+begin -- thgsnf_praluent_master_trn
 
   t1                                             :=  t1 + 1;
   t1_rec(t1)                                     :=  null;
@@ -390,7 +390,7 @@ begin
   commit;
   begin
      forall i in 1..t1_rec.count save exceptions
-        update thgsnf_toujeo_master_trn
+        update thgsnf_praluent_master_trn
         set    status                             =  t1_rec(i).status
         where  client_id                          =  t1_rec(i).client_id
         and    table_id                           =  t1_rec(i).table_id
@@ -424,7 +424,7 @@ end update_t1_recs;
 procedure load_t2_rec
 -------------------------------------------------------------------------------------------------------------
 is
-begin -- thgsnf_toujeo_survey_trn
+begin -- thgsnf_praluent_survey_trn
 
   t2                                             :=  t2 + 1;
   t2_rec(t2)                                     :=  null;
@@ -447,7 +447,7 @@ begin
   commit;
   begin
      forall i in 1..t2_rec.count save exceptions
-        update thgsnf_toujeo_survey_trn
+        update thgsnf_praluent_survey_trn
         set    status                             =  t2_rec(i).status
         where  client_id                          =  t2_rec(i).client_id
         and    table_id                           =  t2_rec(i).table_id
@@ -481,7 +481,7 @@ end update_t2_recs;
 procedure validate_c1_rec
 -------------------------------------------------------------------------------------------------------------
 is
-begin -- thgsnf_toujeo_master_trn
+begin -- thgsnf_praluent_master_trn
 
   error_sw                                       := 'N';
   e1_hib_id                                      :=  c1_rec(c1).hib_id;
@@ -489,41 +489,166 @@ begin -- thgsnf_toujeo_master_trn
   e1_source_table_id                             :=  t1_table_id;
   e1_target_table                                :=  t1_table_id;
   ------------------------------------------------------------------------------
-  db_column_name                                 := 'hib_id';
+  db_column_name                                 := 'valid';
   --
-  if c1_rec(c1).s_hib_id is null
+  if c1_rec(c1).valid is null
   then
-     db_error_desc                               := 'not on '||t2_table_name; 
+     db_error_desc                               := 'can not be null';  --:= 'not on '||t2_table_name; 
      load_e1_rec;
   end if;
   ------------------------------------------------------------------------------
-  db_column_name                                 := 'first/last name';
+  db_column_name                                 := 'product_code';
   --
-  if c1_rec(c1).first_name||c1_rec(c1).last_name is null
+  if c1_rec(c1).product_code is null
+  then
+     db_error_desc                               := 'can not be null';  --:= 'not on '||t2_table_name; 
+     load_e1_rec;
+  end if;
+  ------------------------------------------------------------------------------
+  db_column_name                                 := 'source_code';
+  --
+  if c1_rec(c1).source_code is null
+  then
+     db_error_desc                               := 'can not be null';  --:= 'not on '||t2_table_name; 
+     load_e1_rec;
+  end if;
+  ------------------------------------------------------------------------------
+  db_column_name                                 := 'contact_date';
+  --
+  if c1_rec(c1).contact_date is null
+  then
+     db_error_desc                               := 'can not be null';  --:= 'not on '||t2_table_name; 
+     load_e1_rec;
+  end if;
+  ------------------------------------------------------------------------------
+  db_column_name                                 := 'patient_first_name';
+  --
+  if c1_rec(c1).patient_first_name is null
   then
      db_error_desc                               := 'can not be null'; 
      load_e1_rec;
   end if;
   ------------------------------------------------------------------------------
-  db_column_name                                 := 'first/last name';
+  db_column_name                                 := 'patient_last_name';
   --
-  if c1_rec(c1).first_name||c1_rec(c1).last_name is null
+  if  c1_rec(c1).patient_last_name is null
   then
      db_error_desc                               := 'can not be null'; 
      load_e1_rec;
   end if;
   ------------------------------------------------------------------------------
-  db_column_name                                 := 'contact information';
+  db_column_name                                 := 'patient_address1';
   --
-  if  c1_rec(c1).primary_phone||c1_rec(c1).secondary_phone is null
-  and c1_rec(c1).email_address is null
-  and ((c1_rec(c1).address1 is null) or
-       (c1_rec(c1).city||c1_rec(c1).zip is null) or
-       (c1_rec(c1).state||c1_rec(c1).zip is null))
+  if c1_rec(c1).patient_address1 is null
   then
      db_error_desc                               := 'can not be null'; 
      load_e1_rec;
   end if;
+  ------------------------------------------------------------------------------
+   db_column_name                                 := 'patient_city';
+  --
+  if c1_rec(c1).patient_city is null
+  then
+     db_error_desc                               := 'can not be null'; 
+     load_e1_rec;
+  end if;
+  ------------------------------------------------------------------------------
+  db_column_name                                 := 'patient_state';
+  --
+  if c1_rec(c1).patient_state is null
+  then
+     db_error_desc                               := 'can not be null'; 
+     load_e1_rec;
+  end if;
+  ------------------------------------------------------------------------------ 
+  ------------------------------------------------------------------------------
+  db_column_name                                 := 'patient_zip';
+  --
+  if c1_rec(c1).patient_zip is null
+  then
+     db_error_desc                               := 'can not be null'; 
+     load_e1_rec;
+  end if;
+  ------------------------------------------------------------------------------
+  db_column_name                                 := 'patient_dob';
+  --
+  if c1_rec(c1).patient_dob is null
+  then
+     db_error_desc                               := 'can not be null'; 
+     load_e1_rec;
+  end if;
+  ------------------------------------------------------------------------------  
+  db_column_name                                 := 'patient_email_address ';
+  --
+  if c1_rec(c1).patient_email_address is null
+  then
+     db_error_desc                               := 'can not be null'; 
+     load_e1_rec;
+  end if;
+  ------------------------------------------------------------------------------  
+  db_column_name                                 := 'patient_sign';
+  --
+  if c1_rec(c1).patient_sign is null
+  then
+     db_error_desc                               := 'can not be null'; 
+     load_e1_rec;
+  end if;
+  ------------------------------------------------------------------------------  
+  db_column_name                                 := 'contact_date';
+  --
+  begin
+      if to_date(c1_rec(c1).contact_date,'MM/DD/YYYY') then
+        null;
+      end if;
+  exception when others then 
+     db_error_desc                               := 'invalid contact_date should be mm/dd/yyyy'; 
+     load_e1_rec;
+  end;
+  ------------------------------------------------------------------------------
+    db_column_name                                 := 'date_of_birth';
+  --
+  begin
+      if to_date(c1_rec(c1).date_of_birth,'MM/DD/YYYY') then
+        null;
+      end if;
+  exception when others then 
+     db_error_desc                               := 'invalid date_of_birth should be mm/dd/yyyy'; 
+     load_e1_rec;
+  end;
+  ------------------------------------------------------------------------------
+    db_column_name                                 := 'patient_dob';
+  --
+  begin
+      if to_date(c1_rec(c1).patient_dob,'MM/DD/YYYY') then
+        null;
+      end if;
+  exception when others then 
+     db_error_desc                               := 'invalid patient_dob should be mm/dd/yyyy'; 
+     load_e1_rec;
+  end;
+  ------------------------------------------------------------------------------
+    db_column_name                                 := 'patient_date';
+  --
+  begin
+      if to_date(c1_rec(c1).patient_date,'MM/DD/YYYY') then
+        null;
+      end if;
+  exception when others then 
+     db_error_desc                               := 'invalid patient_date should be mm/dd/yyyy'; 
+     load_e1_rec;
+  end;
+  ------------------------------------------------------------------------------
+--  db_column_name                                 := 'contact information';
+  --
+--  if  c1_rec(c1).primary_phone||c1_rec(c1).secondary_phone is null
+--  and c1_rec(c1).email_address is null
+--  and ((c1_rec(c1).address1 is null) or
+--       (c1_rec(c1).city||c1_rec(c1).zip is null) or
+--       (c1_rec(c1).state||c1_rec(c1).zip is null))
+--  then
+--     db_error_desc                               := 'can not be null'; 
+--     load_e1_rec;
+--  end if;
   ------------------------------------------------------------------------------
 
 end validate_c1_rec;
@@ -602,7 +727,7 @@ end proc_c1_cur;
 procedure validate_c2_rec
 -------------------------------------------------------------------------------------------------------------
 is
-begin -- thgsnf_toujeo_survey_trn
+begin -- thgsnf_praluent_survey_trn
 
   error_sw                                       := 'N';
   e1_hib_id                                      :=  c2_rec(c2).hib_id;
@@ -703,7 +828,7 @@ end proc_c2_cur;
 procedure validate_c3_rec
 -------------------------------------------------------------------------------------------------------------
 is
-begin -- thgsnf_toujeo_survey_trn
+begin -- thgsnf_praluent_survey_trn
 
   error_sw                                       := 'N';
   e1_hib_id                                      :=  c3_rec(c3).hib_id;
@@ -733,17 +858,17 @@ begin
   ud_rec.hib_id_seq                              :=  c3_rec(c3).hib_id_seq;
   ud_rec.status                                  := 'ERR';
 
-  if c3_rec(c3).ip_record_type = '01'
-  then
-     v_proc_step_msg                             := 'load_t1_rec';
-     load_t1_rec;
-  elsif c3_rec(c3).ip_record_type = '02'
-  then
-     v_proc_step_msg                             := 'load_t2_rec';
-     load_t2_rec;
-  else
-     raise_application_error(-20011,'invalid ip_record_type (01,02): '||c3_rec(c3).ip_record_type);
-  end if;
+--  if c3_rec(c3).ip_record_type = '01'
+--  then
+--     v_proc_step_msg                             := 'load_t1_rec';
+--     load_t1_rec;
+--  elsif c3_rec(c3).ip_record_type = '02'
+--  then
+--     v_proc_step_msg                             := 'load_t2_rec';
+--     load_t2_rec;
+--  else
+--     raise_application_error(-20011,'invalid ip_record_type (01,02): '||c3_rec(c3).ip_record_type);
+--  end if;
 
 end proc_c3_rec;
 
@@ -862,16 +987,16 @@ BEGIN
   proc_c1_cur;
   --
   v_proc_step_msg                                := 'proc_c2_cur';
-  proc_c2_cur;
+--  proc_c2_cur;
   --
   v_proc_step_msg                                := 'proc_c3_cur';
-  proc_c3_cur;
+--  proc_c3_cur;
   --
   v_proc_step_msg                                := 'close_process';
   close_process;
   --
   v_proc_step_msg                                := 'SNF_TOUJEO_TEMPMDB_LD_SP';
-  SNF_TOUJEO_TEMPMDB_LD_SP (p_vendor_id, p_email_notify);
+--  SNF_TOUJEO_TEMPMDB_LD_SP (p_vendor_id, p_email_notify);
 
 
 -----------------------------------------------------------------------------------------

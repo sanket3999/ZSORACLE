@@ -351,7 +351,11 @@ begin -- thgsnf_praluent_master_trn (01)
   t1_rec(t1).file_id                             :=  db_file_id;
   t1_rec(t1).load_date                           :=  proc_sysdate;
   t1_rec(t1).proc_date                           :=  null;   
+  if ip_fields(01) = 1 then
   t1_rec(t1).status                              := 'N';
+  else 
+  t1_rec(t1).status                              := 'I'; --invalid record sent to the email fulfillment
+  end if;
   t1_rec(t1).maint_type                          := 'I';
   begin
     fld_nbr    :=1;     t1_rec(t1).valid                    :=  ip_fields(01) ;
@@ -455,7 +459,11 @@ begin --thgsnf_praluent_survey_trn (02)
   t2_rec(t2).file_id                             :=  db_file_id;
   t2_rec(t2).load_date                           :=  proc_sysdate;
   t2_rec(t2).PROC_DATE                           :=  null;   
+  if ip_fields(01) = 1 then
   t2_rec(t2).status                              := 'N';
+  else
+  t2_rec(t2).status                              := 'I'; --invalid record sent to the email fulfillment 
+  end if;
   t2_rec(t2).maint_type                          := 'I';
   begin
      fld_nbr                                     :=  1;
@@ -807,7 +815,7 @@ BEGIN
   update_r1_rec;
   --
   v_proc_step_msg                                := 'SNF_TOUJEO_TRN_PR_SP';
- -- SNF_TOUJEO_TRN_PR_SP (p_vendor_id, p_email_notify);
+  SNF_TOUJEO_TRN_PR_SP (p_vendor_id, p_email_notify);
 
 -----------------------------------------------------------------------------------------
 EXCEPTION

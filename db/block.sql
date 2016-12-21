@@ -19,15 +19,26 @@ on mt.file_id = st.file_id and  mt.hib_id = st.hib_id and mt.valid = 1 ;
 
 
 set serveroutput on;
-
 begin
-    MDB_FILE_LOADER_SP('spatel2@hibbertgroup.com','Praluent_Enrollment_Hibbert*');
+    mdb_file_loader_sp('spatel2@hibbertgroup.com','Praluent_Enrollment_Hibbert*');
 end;
 
+-------------------------------------------------------------------------------
 
+delete  thgmdb_error_dtl where trunc(load_date) >= trunc(sysdate) ;
+update  thgsnf_praluent_master_trn set status = 'N';
+update  thgsnf_praluent_survey_trn set status = 'N';
+commit;
 
-SNF_TOUJEO_TRN_PR_SP;
+select * from thgmdb_error_dtl where trunc(load_date) >= trunc(sysdate) ;
+select * from thgsnf_praluent_master_trn;
+select * from thgsnf_praluent_survey_trn;
+commit;
 
+set serveroutput on;
+begin
+snf_toujeo_trn_pr_sp(1,'spatel2@hibbertgroup.com');
+end;
 
 select s1.survey_name,
        s1.survey_description,
@@ -51,5 +62,4 @@ where s1.survey_name = 'PraluentEnrollmentForm'
    and s2.question_id = s3.question_id
    and s2.question_id = q1.question_id
    and s3.answer_id = a1.answer_id
-order by question_id
-;
+order by question_id;
